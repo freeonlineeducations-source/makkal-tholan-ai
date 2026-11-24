@@ -1,0 +1,195 @@
+
+<b:if cond='data:view.isPage'>
+  <div id='makkal-ai-studio'>
+    <style>
+      #makkal-ai-studio {
+        max-width:850px;
+        margin:20px auto;
+        padding:20px;
+        background:#101827;
+        color:white;
+        border-radius:15px;
+        font-family:Arial,sans-serif;
+      }
+      #makkal-ai-studio * {
+        box-sizing:border-box;
+      }
+      #makkal-ai-studio h2 {
+        text-align:center;
+        color:#ffd43b;
+      }
+      #makkal-ai-studio textarea,
+      #makkal-ai-studio select {
+        width:100%;
+        padding:13px;
+        margin:8px 0;
+        border-radius:8px;
+      }
+      #makkal-ai-studio textarea {
+        height:110px;
+      }
+      #makkal-ai-studio button {
+        width:100%;
+        padding:15px;
+        margin-top:15px;
+        border:0;
+        border-radius:8px;
+        background:#e11d48;
+        color:white;
+        font-weight:bold;
+        font-size:16px;
+      }
+      #makkal-ai-studio img {
+        width:100%;
+        margin-top:15px;
+        border-radius:10px;
+      }
+      #mt-download {
+        display:block;
+        background:#16a34a;
+        padding:14px;
+        color:white;
+        text-align:center;
+        margin-top:12px;
+        text-decoration:none;
+        border-radius:8px;
+      }
+    </style>
+
+    <h2>MAKKAL THOLAN AI IMAGE CREATOR</h2>
+
+    <p>Describe your image</p>
+
+    <textarea id='mt-prompt'
+      placeholder='Describe a realistic human, animal, bird, nature or film scene...'></textarea>
+
+    <p>Image Category</p>
+
+    <select id='mt-category'>
+      <option>Realistic Humans</option>
+      <option>Indian Men</option>
+      <option>Indian Women</option>
+      <option>Animals</option>
+      <option>Birds</option>
+      <option>Nature</option>
+      <option>Film Scenes</option>
+      <option>Movie Posters</option>
+      <option>Buddha and Temples</option>
+      <option>Fantasy</option>
+    </select>
+
+    <p>Image Style</p>
+
+    <select id='mt-style'>
+      <option>Photorealistic</option>
+      <option>Cinematic Realism</option>
+      <option>Professional Photography</option>
+      <option>3D Realistic</option>
+      <option>Fantasy Realism</option>
+    </select>
+
+    <p>Image Size</p>
+
+    <select id='mt-size'>
+      <option value='1024x1024'>Square</option>
+      <option value='1024x1536'>Portrait</option>
+      <option value='1536x1024'>Landscape</option>
+    </select>
+
+    <button id='mt-create' onclick='mtGenerateImage()'>
+      CREATE REAL IMAGE
+    </button>
+
+    <p id='mt-status'></p>
+
+    <div id='mt-result'></div>
+
+    <script type='text/javascript'>
+    //<![CDATA[
+
+    async function mtGenerateImage() {
+
+      var prompt =
+        document.getElementById('mt-prompt').value;
+
+      var category =
+        document.getElementById('mt-category').value;
+
+      var style =
+        document.getElementById('mt-style').value;
+
+      var size =
+        document.getElementById('mt-size').value;
+
+      var status =
+        document.getElementById('mt-status');
+
+      var result =
+        document.getElementById('mt-result');
+
+      var button =
+        document.getElementById('mt-create');
+
+      if (!prompt.trim()) {
+        status.innerText = 'Enter image description';
+        return;
+      }
+
+      button.disabled = true;
+      status.innerText = 'Generating image...';
+      result.innerHTML = '';
+
+      try {
+
+        var response = await fetch(
+          'https://YOUR-RENDER-URL.onrender.com/api/generate',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              prompt: prompt,
+              category: category,
+              style: style,
+              size: size
+            })
+          }
+        );
+
+        var data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Image generation failed');
+        }
+
+        var img = document.createElement('img');
+        img.src = data.image;
+        img.alt = 'Generated image';
+
+        var link = document.createElement('a');
+        link.id = 'mt-download';
+        link.href = data.image;
+        link.download = 'makkal-tholan-image.png';
+        link.innerText = 'DOWNLOAD IMAGE';
+
+        result.appendChild(img);
+        result.appendChild(link);
+
+        status.innerText = 'Image created successfully!';
+
+      } catch(error) {
+
+        status.innerText = 'Error: ' + error.message;
+
+      } finally {
+
+        button.disabled = false;
+
+      }
+    }
+
+    //]]>
+    </script>
+  </div>
+</b:if>
